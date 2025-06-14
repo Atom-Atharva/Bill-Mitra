@@ -5,8 +5,10 @@ import in.billmitra.io.CategoryRequest;
 import in.billmitra.io.CategoryResponse;
 import in.billmitra.repository.CategoryRepository;
 import in.billmitra.service.CategoryService;
+import in.billmitra.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,11 +19,15 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final FileUploadService fileUploadService;
 
     @Override
-    public CategoryResponse add(CategoryRequest request) {
+    public CategoryResponse add(CategoryRequest request, MultipartFile file) {
+        String imgUrl = fileUploadService.uploadFile(file);
+
         // Create Category
         CategoryEntity category = convertToEntity(request);
+        category.setImgUrl(imgUrl);
 
         // Save to DB
         category = categoryRepository.save(category);
@@ -42,8 +48,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(String categoryId) {
         CategoryEntity existingCategory = categoryRepository.findByCategoryId(categoryId)
-                .orElseThrow(()-> new RuntimeException("Category not found: "+ categoryId));
-
+                .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
+        fileUploadService.deleteFile(existingCategory.getImgUrl());
         categoryRepository.delete(existingCategory);
     }
 
