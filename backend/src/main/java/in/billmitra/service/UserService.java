@@ -6,11 +6,11 @@ import in.billmitra.io.UserResponse;
 import java.util.List;
 
 public interface UserService {
-    public UserResponse createUser(UserRequest request);
+    UserResponse createUser(UserRequest request);
 
-    public String getUserRole(String email);
+    String getUserRole(String email);
 
-    public List<UserResponse> readAllUsers();
+    List<UserResponse> readAllUsers();
 
-    public void deleteUser(String userId);
+    void deleteUser(String userId);
 }
