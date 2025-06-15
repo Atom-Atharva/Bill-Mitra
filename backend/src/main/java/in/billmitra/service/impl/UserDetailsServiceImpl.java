@@ -27,4 +27,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return new User(user.getEmail(), user.getPassword(), Collections.singleton(new SimpleGrantedAuthority(user.getRole())));
     }
+
+    public boolean isUserCreated(String email){
+        return userRepository.findByEmail(email).isPresent();
+    }
 }

@@ -4,6 +4,8 @@ import in.billmitra.io.AuthRequest;
 import in.billmitra.io.AuthResponse;
 import in.billmitra.service.UserService;
 import in.billmitra.util.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
+    public AuthResponse login(@RequestBody AuthRequest request, HttpServletResponse response) {
         // Authenticate the User
         authenticate(request.getEmail(),request.getPassword());
 
@@ -46,6 +48,15 @@ public class AuthController {
 
         // Get Role
         final String role = userService.getUserRole(request.getEmail());
+
+        // Set Cookie
+        Cookie cookie = new Cookie("jwt",jwtToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60*60*24);
+
+        response.addCookie(cookie);
 
         return new AuthResponse(request.getEmail(),jwtToken, role);
     }
